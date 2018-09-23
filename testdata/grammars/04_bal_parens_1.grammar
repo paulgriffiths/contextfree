@@ -1,0 +1,8 @@
+# Left-recursive grammar defining a language of balanced parentheses.
+#
+# Original example taken from Aho, Lam, Sethi, Ullman (2007).
+# 'Compilers: Principles, Techniques & Tools', Second Edition.
+# Pearson Education, Inc.
+# Exercise 4.2.2.c, p.207
+
+S : S `\(` S `\)` S | e

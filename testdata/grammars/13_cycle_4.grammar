@@ -1,0 +1,5 @@
+# This grammar contains a depth-two indirect cycle on nonterminal S
+
+S : A | `a` | `b`
+A : B | `c` | `d`
+B : S | `e` | `f`

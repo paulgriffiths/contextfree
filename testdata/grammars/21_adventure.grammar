@@ -1,0 +1,13 @@
+# Grammar for hypothetical text-based adventure game.
+
+S              : Command
+Command        : `go` Direction
+               | `kill` Character OptionalWeapon
+               | `open` Openable OptionalOpener
+Direction      : `north` | `east` | `south` | `west` | `up` | `down`
+Character      : `dwarf` | `snake` | `unicorn` | `rat`
+OptionalWeapon : `with` Weapon | e
+Weapon         : `sword` | `poison` | `hands` | `dwarf`
+Openable       : `door` | `trapdoor` | `box` | `mind` 
+OptionalOpener : `with` Opener | e
+Opener         : `key` | `scissors` | `sword`

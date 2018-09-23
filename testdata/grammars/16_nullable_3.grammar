@@ -1,0 +1,10 @@
+# S is nullable via C D, and G, since G is nullable only via cycle with S.
+
+S : A B | G | C D
+A : F
+B : E | F | e
+C : E | B
+D : F | e
+E : `a`
+F : `b`
+G : E | F | S

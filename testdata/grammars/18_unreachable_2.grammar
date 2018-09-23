@@ -1,0 +1,15 @@
+# Left-recursive grammar for basic arithmetic addition and multiplcation.
+# With added unreachable non-terminals.
+#
+# Original example taken from Aho, Lam, Sethi, Ullman (2007).
+# 'Compilers: Principles, Techniques & Tools', Second Edition.
+# Pearson Education, Inc.
+# Grammar 4.1, p.193.
+
+E      : E `\+` T | T
+T      : T `\*` F | F
+F      : `\(` E `\)` | Digits
+Digits : `[[:digit:]]+`
+U      : E
+V      : `a` | `b` U
+W      : V | W | `c` | e

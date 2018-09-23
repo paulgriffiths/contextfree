@@ -1,0 +1,5 @@
+# This grammar is missing a closing ` for the terminal 'c'
+# in the second production.
+
+S : A `a` | `b`
+A : A `c | S `d` | e

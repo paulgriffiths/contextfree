@@ -1,0 +1,9 @@
+# S is nullable via C D, both of which have e-productions in their own right.
+
+S : A B | C D
+A : E
+B : F
+C : E | e
+D : F | e
+E : `a`
+F : `b`

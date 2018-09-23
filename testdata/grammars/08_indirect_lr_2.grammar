@@ -1,0 +1,7 @@
+# This grammar defines a language with a non-terminal S which is
+# left-recursive after 3 steps of derivation.
+
+S : A `a` | `b`
+A : B `c` | e
+B : C `d` | e
+C : S `e` | e

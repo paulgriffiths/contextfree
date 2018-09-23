@@ -1,0 +1,10 @@
+# This grammar defines a language with a non-terminal S which is
+# left-recursive but not immediately left-recursive.
+#
+# Original example taken from Aho, Lam, Sethi, Ullman (2007).
+# 'Compilers: Principles, Techniques & Tools', Second Edition.
+# Pearson Education, Inc.
+# Grammar 4.1, p.193.
+
+S : A `a` | `b`
+A : A `c` | S `d` | e

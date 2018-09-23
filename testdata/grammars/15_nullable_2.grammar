@@ -1,0 +1,10 @@
+# S is nullable via C D, where C is nullable only via B, with no
+# e-productions in its own right.
+
+S : A B | C D
+A : F
+B : E | F | e
+C : E | B
+D : F | e
+E : `a`
+F : `b`

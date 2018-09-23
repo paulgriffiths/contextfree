@@ -1,0 +1,9 @@
+# Ambiguous grammar for basic arithmetic addition and multiplcation.
+#
+# Original example taken from Aho, Lam, Sethi, Ullman (2007).
+# 'Compilers: Principles, Techniques & Tools', Second Edition.
+# Pearson Education, Inc.
+# Grammar 4.3, p.194.
+
+E      : E `\+` E | E `\*` E | `\(` E `\)` | Digits
+Digits : `[[:digit:]]+`
