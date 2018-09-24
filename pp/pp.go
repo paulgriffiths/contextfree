@@ -2,9 +2,10 @@ package pp
 
 import (
 	"github.com/paulgriffiths/contextfree/grammar"
-	"github.com/paulgriffiths/contextfree/lexer"
+	"github.com/paulgriffiths/lexer"
 	"github.com/paulgriffiths/contextfree/tree"
 	"github.com/paulgriffiths/contextfree/types/symbols"
+    "strings"
 )
 
 // Pp represents a predictive parser.
@@ -15,33 +16,33 @@ type Pp struct {
 }
 
 // NewPp constructs a new predictive parser for a context-free grammar.
-func New(grammar *grammar.Grammar) *Pp {
-	table := makePPTable(grammar)
-	l, err := lexer.New(grammar)
+func New(g *grammar.Grammar) *Pp {
+	table := makePPTable(g)
+	l, err := lexer.New(g.Terminals)
 	if err != nil {
 		return nil
 	}
-	newParser := Pp{grammar, table, l}
+	newParser := Pp{g, table, l}
 	return &newParser
 }
 
 // Parse parses input against a grammar and returns a parse tree,
 // or nil on failure.
 func (p Pp) Parse(input string) *tree.Node {
-	terminals, err := p.lexer.Lex(input)
+	tokens, err := p.lexer.Lex(strings.NewReader(input))
 	if err != nil {
 		return nil
 	}
 
-	node, n := p.parseNT(terminals, 0)
-	if n == terminals.Len() {
+	node, n := p.parseNT(tokens, 0)
+	if n == tokens.Len() {
 		return node
 	}
 	return nil
 }
 
 // parseSymbol parses a production str sym.
-func (p Pp) parseSymbol(t lexer.TerminalList, comp symbols.Symbol) (*tree.Node, int) {
+func (p Pp) parseSymbol(t lexer.TokenList, comp symbols.Symbol) (*tree.Node, int) {
 	var node *tree.Node
 	numTerms := 0
 
@@ -49,8 +50,8 @@ func (p Pp) parseSymbol(t lexer.TerminalList, comp symbols.Symbol) (*tree.Node, 
 	case symbols.SymbolNonTerminal:
 		node, numTerms = p.parseNT(t, comp.I)
 	case symbols.SymbolTerminal:
-		if !t.IsEmpty() && t[0].N == comp.I {
-			node, numTerms = tree.NewNode(comp, t[0].S, nil), 1
+		if !t.IsEmpty() && t[0].ID == comp.I {
+			node, numTerms = tree.NewNode(comp, t[0].Value, nil), 1
 		}
 	case symbols.SymbolEmpty:
 		node = tree.NewNode(comp, "e", nil)
@@ -60,7 +61,7 @@ func (p Pp) parseSymbol(t lexer.TerminalList, comp symbols.Symbol) (*tree.Node, 
 }
 
 // parseNT parses a non-terminal.
-func (p Pp) parseNT(t lexer.TerminalList, nt int) (*tree.Node, int) {
+func (p Pp) parseNT(t lexer.TokenList, nt int) (*tree.Node, int) {
 
 	// If there are no more terminals in the list, check whether
 	// the current nonterminal can be followed by end-of-input.
@@ -83,7 +84,7 @@ func (p Pp) parseNT(t lexer.TerminalList, nt int) (*tree.Node, int) {
 	// returning an error if the predictive parsing table doesn't
 	// contain an entry.
 
-	str := p.Table[nt][t[0].N]
+	str := p.Table[nt][t[0].ID]
 	if str.IsEmpty() {
 		return nil, 0
 	}
@@ -100,7 +101,7 @@ func (p Pp) parseNT(t lexer.TerminalList, nt int) (*tree.Node, int) {
 }
 
 // parseString parses a production str.
-func (p Pp) parseString(t lexer.TerminalList, str symbols.String) ([]*tree.Node, int) {
+func (p Pp) parseString(t lexer.TokenList, str symbols.String) ([]*tree.Node, int) {
 	var children []*tree.Node
 	matchLength := 0
 

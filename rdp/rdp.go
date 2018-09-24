@@ -2,9 +2,10 @@ package rdp
 
 import (
 	"github.com/paulgriffiths/contextfree/grammar"
-	"github.com/paulgriffiths/contextfree/lexer"
 	"github.com/paulgriffiths/contextfree/tree"
 	"github.com/paulgriffiths/contextfree/types/symbols"
+	"github.com/paulgriffiths/lexer"
+	"strings"
 )
 
 // Rdp implements a recursive descent parser.
@@ -15,7 +16,7 @@ type Rdp struct {
 
 // New creates a new recursive descent parser.
 func New(g *grammar.Grammar) (*Rdp, error) {
-	l, err := lexer.New(g)
+	l, err := lexer.New(g.Terminals)
 	if err != nil {
 		return nil, err
 	}
@@ -26,39 +27,39 @@ func New(g *grammar.Grammar) (*Rdp, error) {
 // Parse parses input against a grammar and returns a parse tree,
 // or nil on failure.
 func (r Rdp) Parse(input string) *tree.Node {
-	terminals, err := r.lexer.Lex(input)
+	tokens, err := r.lexer.Lex(strings.NewReader(input))
 	if err != nil {
 		return nil
 	}
 
-	node, n := r.parseNT(terminals, 0)
-	if n == len(terminals) {
+	node, n := r.parseNT(tokens, 0)
+	if n == len(tokens) {
 		return node
 	}
 	return nil
 }
 
-// parseComp parses a production body component.
-func (r Rdp) parseComp(t lexer.TerminalList, comp symbols.Symbol) (*tree.Node, int) {
+// parseComp parses a grammar symbol.
+func (r Rdp) parseComp(t lexer.TokenList, sym symbols.Symbol) (*tree.Node, int) {
 	var node *tree.Node
 	numTerms := 0
 
-	switch comp.T {
+	switch sym.T {
 	case symbols.SymbolNonTerminal:
-		node, numTerms = r.parseNT(t, comp.I)
+		node, numTerms = r.parseNT(t, sym.I)
 	case symbols.SymbolTerminal:
-		if len(t) > 0 && comp.I == t[0].N {
-			node, numTerms = tree.NewNode(comp, t[0].S, nil), 1
+		if len(t) > 0 && sym.I == t[0].ID {
+			node, numTerms = tree.NewNode(sym, t[0].Value, nil), 1
 		}
 	case symbols.SymbolEmpty:
-		node = tree.NewNode(comp, "e", nil)
+		node = tree.NewNode(sym, "e", nil)
 	}
 
 	return node, numTerms
 }
 
 // parseNT parses a non-terminal.
-func (r Rdp) parseNT(t lexer.TerminalList, nt int) (*tree.Node, int) {
+func (r Rdp) parseNT(t lexer.TokenList, nt int) (*tree.Node, int) {
 	for _, body := range r.g.Prods[nt] {
 		if children, numTerms := r.parseBody(t, body); children != nil {
 			return tree.NewNode(
@@ -73,12 +74,12 @@ func (r Rdp) parseNT(t lexer.TerminalList, nt int) (*tree.Node, int) {
 }
 
 // parseBody parses a production body.
-func (r Rdp) parseBody(t lexer.TerminalList, body []symbols.Symbol) ([]*tree.Node, int) {
+func (r Rdp) parseBody(t lexer.TokenList, body []symbols.Symbol) ([]*tree.Node, int) {
 	var children []*tree.Node
 	matchLength := 0
 
-	for _, component := range body {
-		node, numTerms := r.parseComp(t[matchLength:], component)
+	for _, symbol := range body {
+		node, numTerms := r.parseComp(t[matchLength:], symbol)
 		if node == nil {
 			return nil, 0
 		}
