@@ -3,21 +3,44 @@ package grammar
 // BUG: Doesn't throw error if undefined nonterminal is present.
 
 import (
-	"github.com/paulgriffiths/contextfree/grammar/internal/lexer"
 	"github.com/paulgriffiths/contextfree/types/symbols"
+	"github.com/paulgriffiths/lexer"
 	"io"
+)
+
+var lexemePatterns = []string{
+	"#[^\n]*\n",
+	"[[:alpha:]][[:alnum:]']*",
+	"`[^`]+`",
+	"\\|",
+	":",
+	"\n",
+}
+
+const (
+	tComment = iota
+	tNonT
+	tT
+	tAlt
+	tArrow
+	tNewline
+	tEmpty
 )
 
 // parse parses a context-free grammar and creates a corresponding
 // data structure.
 func parse(input io.Reader) (*Grammar, error) {
-	tokens, lerr := lexer.Lex(input)
+	l, lerr := lexer.New(lexemePatterns)
 	if lerr != nil {
 		return nil, lerr
 	}
 
-	g := firstPass(tokens)
+	tokens, err := l.Lex(input)
+	if err != nil {
+		return nil, lerr
+	}
 
+	g := firstPass(tokens)
 	if perr := secondPass(g, tokens); perr != nil {
 		return nil, perr
 	}
@@ -27,111 +50,117 @@ func parse(input io.Reader) (*Grammar, error) {
 
 // secondPass takes a second pass through the grammar and extracts
 // the productions.
-func secondPass(g *Grammar, tokens []lexer.Token) ParseErr {
-	reader := lexer.NewTokenReader(tokens)
+func secondPass(g *Grammar, t lexer.TokenList) ParseErr {
+	tRead := 0
+	for tRead < t.Len() {
 
-	for !reader.AtEnd() {
-		if perr := getNextProduction(g, &reader); perr != nil {
-			return perr
+		// Skip comments and empty lines
+
+		for tokenIndexIs(t, tRead, tComment, tNewline) {
+			tRead++
+			continue
 		}
-	}
 
+		// Get the next grammar production
+
+		numRead, err := getNextProduction(g, t[tRead:])
+		if err != nil {
+			return err
+		}
+		tRead += numRead
+	}
 	return nil
 }
 
 // getNextProduction extracts the next production.
-func getNextProduction(g *Grammar, reader *lexer.TokenReader) ParseErr {
-	if !reader.Match(lexer.TokenNonTerminal) {
-		token := reader.Lookahead()
-		return ParseError{ParseErrMissingHead, token.Pos.LineOnly()}
+func getNextProduction(g *Grammar, t lexer.TokenList) (int, ParseErr) {
+	if !tokenIndexIs(t, 0, tNonT) {
+		return 0, ParseError{ParseErrMissingHead, t[0].Index}
+	}
+	if !tokenIndexIs(t, 1, tArrow) {
+		return 1, ParseError{ParseErrMissingArrow, t[1].Index}
 	}
 
-	head := g.NtTable[reader.Current().S]
-
-	if !reader.Match(lexer.TokenArrow) {
-		token := reader.Current()
-		return ParseError{ParseErrMissingArrow,
-			token.Pos.Advance(len(reader.Current().S))}
-	}
+	head := g.NtTable[t[0].Value]
+	tRead := 2
 
 	for {
-		cmp, perr := getNextBody(g, reader)
+		str, n, perr := getNextBody(g, t[tRead:])
+		tRead += n
 		if perr != nil {
-			return perr
+			return tRead, perr
 		}
 
-		g.Prods[head] = append(g.Prods[head], cmp)
+		g.Prods[head] = append(g.Prods[head], str)
 
-		reader.Match(lexer.TokenEndOfLine)
-		if !reader.Match(lexer.TokenAlt) {
+		if tokenIndexIs(t, tRead, tNewline) {
+			tRead++
+		}
+		if !tokenIndexIs(t, tRead, tAlt) {
 			break
 		}
+		tRead++
 	}
 
-	return nil
+	return tRead, nil
 }
 
 // getNextBody extracts the next production body.
-func getNextBody(g *Grammar, reader *lexer.TokenReader) (symbols.String, ParseErr) {
-	if reader.Match(lexer.TokenEmpty) {
-		token := reader.Current()
-		if reader.Peek(lexer.TokenNonTerminal) ||
-			reader.Peek(lexer.TokenTerminal) ||
-			reader.Peek(lexer.TokenEmpty) {
-			return nil, ParseError{ParseErrEmptyNotAlone,
-				token.Pos.Advance(1)}
+func getNextBody(g *Grammar, t lexer.TokenList) (symbols.String, int, ParseErr) {
+	if tokenIndexIs(t, 0, tEmpty) {
+		if tokenIndexIs(t, 1, tNonT, tT) {
+			return nil, 0, ParseError{ParseErrEmptyNotAlone, t[1].Index}
 		}
-		return symbols.String{symbols.NewSymbolEmpty()}, nil
+		return symbols.String{symbols.NewSymbolEmpty()}, 1, nil
 	}
 
-	cmps := symbols.String{}
+	syms := symbols.String{}
+	n := 0
 
+loop:
 	for {
-		if reader.Match(lexer.TokenNonTerminal) {
-			token := reader.Current()
-			cmps = append(cmps,
-				symbols.NewNonTerminal(g.NtTable[token.S]))
-		} else if reader.Match(lexer.TokenTerminal) {
-			token := reader.Current()
-			cmps = append(cmps,
-				symbols.NewTerminal(g.TTable[token.S]))
-		} else if reader.Match(lexer.TokenEmpty) {
-			token := reader.Current()
-			return nil, ParseError{ParseErrEmptyNotAlone,
-				token.Pos.Advance(1)}
-		} else {
-			break
+		switch {
+		case tokenIndexIs(t, n, tNonT):
+			ntID := g.NtTable[t[n].Value]
+			syms = append(syms, symbols.NewNonTerminal(ntID))
+		case tokenIndexIs(t, n, tT):
+			tID := g.TTable[tTrim(t[n].Value)]
+			syms = append(syms, symbols.NewTerminal(tID))
+		case tokenIndexIs(t, n, tEmpty):
+			return nil, n, ParseError{ParseErrEmptyNotAlone, t[n].Index}
+		default:
+			break loop
 		}
+		n++
 	}
 
-	if len(cmps) == 0 {
-		token := reader.Current()
-		return nil, ParseError{ParseErrEmptyBody,
-			token.Pos.Advance(1)}
+	if len(syms) == 0 {
+		return nil, n, ParseError{ParseErrEmptyBody, t[n].Index}
 	}
 
-	return cmps, nil
+	return syms, n, nil
 }
 
 // firstPass makes a first pass through the grammar to identify
 // the terminals and non-terminals, and to set up the symbol tables.
-func firstPass(tokens []lexer.Token) *Grammar {
+func firstPass(tokens lexer.TokenList) *Grammar {
 	nonTerminals := []string{}
 	terminals := []string{}
 	ntTable := make(map[string]int)
 	tTable := make(map[string]int)
 
 	for _, token := range tokens {
-		switch token.T {
-		case lexer.TokenNonTerminal:
-			if _, ok := ntTable[token.S]; !ok {
-				ntTable[token.S] = len(nonTerminals)
-				nonTerminals = append(nonTerminals, token.S)
+		switch {
+		case tokenIs(token, tNonT):
+			if _, ok := ntTable[token.Value]; !ok {
+				ntTable[token.Value] = len(nonTerminals)
+				nonTerminals = append(nonTerminals, token.Value)
 			}
-		case lexer.TokenTerminal:
-			if _, ok := tTable[token.S]; !ok {
-				tTable[token.S] = len(terminals)
-				terminals = append(terminals, token.S)
+		case tokenIs(token, tT):
+			tvalue := tTrim(token.Value)
+			if _, ok := tTable[tvalue]; !ok {
+				tTable[tvalue] = len(terminals)
+				terminals = append(terminals, tvalue)
 			}
 		}
 	}
@@ -146,4 +175,44 @@ func firstPass(tokens []lexer.Token) *Grammar {
 		follows:      nil,
 	}
 	return &g
+}
+
+// tTrim removes the leading and trailing backquotes from a
+// terminal token value.
+func tTrim(term string) string {
+	return term[1 : len(term)-1]
+}
+
+// tokenIs checks if the type of the token matches any of the
+// provided types. This function distinguishes between nonterminals
+// and the empty symbol, even though the patterns passed to the
+// lexical analyzer do not.
+func tokenIs(t lexer.Token, tokenID ...int) bool {
+	for _, id := range tokenID {
+		if t.ID == tNonT {
+			if id == tEmpty && t.Value == "e" {
+				return true
+			}
+			if id == tNonT && t.Value != "e" {
+				return true
+			}
+		} else if t.ID == id {
+			return true
+		}
+	}
+	return false
+}
+
+// tokenIndexIs checks if the token at index n of the provided list
+// matches any of the provided types. If index n is past the end
+// of the list, the function returns false, so false means the
+// token at the position in question either doesn't match any of the
+// provided types, or it doesn't exist. Put another way, this function
+// may safely be used to check if the token at the specified index
+// exists.
+func tokenIndexIs(tokens lexer.TokenList, n int, tokenID ...int) bool {
+	if n >= len(tokens) {
+		return false
+	}
+	return tokenIs(tokens[n], tokenID...)
 }

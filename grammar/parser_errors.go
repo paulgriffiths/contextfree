@@ -2,7 +2,6 @@ package grammar
 
 import (
 	"fmt"
-	"github.com/paulgriffiths/contextfree/grammar/internal/lar"
 )
 
 // ParseErrorType represents the type of a parser error.
@@ -27,7 +26,7 @@ type ParseErr interface {
 // ParseError is a concrete parser error type.
 type ParseError struct {
 	T   ParseErrorType
-	Pos lar.FilePos
+	Pos int
 }
 
 // parseErrorNames associate parser error type values with descriptive
@@ -45,6 +44,6 @@ func (e ParseError) implementsParseError() {}
 
 // Error returns a string representation of a parser error.
 func (e ParseError) Error() string {
-	return fmt.Sprintf("%s at line %d, char %d",
-		parseErrorNames[e.T], e.Pos.Line, e.Pos.Ch)
+	return fmt.Sprintf("%s at position %d",
+		parseErrorNames[e.T], e.Pos)
 }

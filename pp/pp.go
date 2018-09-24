@@ -2,10 +2,10 @@ package pp
 
 import (
 	"github.com/paulgriffiths/contextfree/grammar"
-	"github.com/paulgriffiths/lexer"
 	"github.com/paulgriffiths/contextfree/tree"
 	"github.com/paulgriffiths/contextfree/types/symbols"
-    "strings"
+	"github.com/paulgriffiths/lexer"
+	"strings"
 )
 
 // Pp represents a predictive parser.
