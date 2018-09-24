@@ -24,6 +24,23 @@ func New(g *grammar.Grammar) (*Rdp, error) {
 	return &r, nil
 }
 
+// FromFile constructs a recursive descent parser from a
+// context-free grammar representation in a text file.
+func FromFile(filename string) (*Rdp, error) {
+	g, gerr := grammar.FromFile(filename)
+	if gerr != nil {
+		return nil, gerr
+	}
+
+	l, lerr := lexer.New(g.Terminals)
+	if lerr != nil {
+		return nil, lerr
+	}
+
+	newParser := Rdp{g, l}
+	return &newParser, nil
+}
+
 // Parse parses input against a grammar and returns a parse tree,
 // or nil on failure.
 func (r Rdp) Parse(input string) *tree.Node {

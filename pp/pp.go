@@ -15,7 +15,7 @@ type Pp struct {
 	lexer *lexer.Lexer
 }
 
-// NewPp constructs a new predictive parser for a context-free grammar.
+// New constructs a new predictive parser for a context-free grammar.
 func New(g *grammar.Grammar) *Pp {
 	table := makePPTable(g)
 	l, err := lexer.New(g.Terminals)
@@ -24,6 +24,24 @@ func New(g *grammar.Grammar) *Pp {
 	}
 	newParser := Pp{g, table, l}
 	return &newParser
+}
+
+// FromFile constructs a predictive parser from a context-free grammar
+// representation in a text file.
+func FromFile(filename string) (*Pp, error) {
+	g, gerr := grammar.FromFile(filename)
+	if gerr != nil {
+		return nil, gerr
+	}
+
+	table := makePPTable(g)
+	l, lerr := lexer.New(g.Terminals)
+	if lerr != nil {
+		return nil, lerr
+	}
+
+	newParser := Pp{g, table, l}
+	return &newParser, nil
 }
 
 // Parse parses input against a grammar and returns a parse tree,
