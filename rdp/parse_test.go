@@ -2,12 +2,13 @@ package rdp_test
 
 import (
 	"bytes"
+	"github.com/paulgriffiths/contextfree/rdp"
 	"testing"
 )
 
 func TestParserAccepts(t *testing.T) {
 	for _, tc := range parserTestCases {
-		parser, err := getParserFromFile(t, tc.filename)
+		parser, err := rdp.FromFile(tc.filename)
 		if err != nil {
 			t.Errorf("couldn't get parser tree for file %q: %v",
 				tc.filename, err)
@@ -25,7 +26,7 @@ func TestParserAccepts(t *testing.T) {
 
 func TestParserRejects(t *testing.T) {
 	for _, tc := range parserTestCases {
-		parser, err := getParserFromFile(t, tc.filename)
+		parser, err := rdp.FromFile(tc.filename)
 		if err != nil {
 			t.Errorf("couldn't get parser tree for file %q: %v",
 				tc.filename, err)
@@ -70,13 +71,16 @@ func TestParseWriteBracketed(t *testing.T) {
 	}
 
 	for n, tc := range testCases {
-		tree, err := getParseTreeFromFile(t, tc.filename, tc.input)
+		parser, err := rdp.FromFile(tc.filename)
 		if err != nil {
-			t.Errorf("couldn't get parse tree for file %q: %v",
+			t.Errorf("couldn't get parser tree for file %q: %v",
 				tc.filename, err)
 			continue
-		} else if tree == nil {
-			t.Errorf("case %d, failed to parse", n+1)
+		}
+
+		tree := parser.Parse(tc.input)
+		if tree == nil {
+			t.Errorf("couldn't get parse tree for file %q", tc.filename)
 			continue
 		}
 
