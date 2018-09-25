@@ -51,7 +51,6 @@ func eval(t *tree.Node, n ...float64) float64 {
 		case sym.IsEmpty():
 			return n[0]
 		}
-		return eval(ch[1], eval(ch[0]))
 
 	case ntTp:
 		switch {
@@ -62,7 +61,6 @@ func eval(t *tree.Node, n ...float64) float64 {
 		case sym.IsEmpty():
 			return n[0]
 		}
-		return eval(ch[1], eval(ch[0]))
 
 	case ntF:
 		switch {
