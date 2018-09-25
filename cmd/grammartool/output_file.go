@@ -2,12 +2,15 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 	"unicode"
 )
 
-func outputFile(file *os.File) {
+func fileToString(file *os.File) string {
+	buffer := bytes.Buffer{}
+
 	file.Seek(0, 0)
 	input := bufio.NewScanner(file)
 
@@ -15,12 +18,16 @@ func outputFile(file *os.File) {
 		for _, s := range input.Text() {
 			if !unicode.IsSpace(rune(s)) {
 				if s != '#' {
-					fmt.Printf("%s\n", input.Text())
+					buffer.Write([]byte(fmt.Sprintf("%s\n", input.Text())))
 				}
 				break
 			}
 		}
 	}
 
-	fmt.Printf("\n")
+	return buffer.String()
+}
+
+func outputFile(file *os.File) {
+	os.Stdout.Write([]byte(fileToString(file)))
 }

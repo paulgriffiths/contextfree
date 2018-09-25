@@ -1,6 +1,6 @@
 *.swp
 *.bak
 *~
-cmd/grammar_info/grammar_info
-cmd/grammar_info/*.grammar
+cmd/grammartool/grammartool
+cmd/grammartool/*.grammar
 cmd/eval/eval
