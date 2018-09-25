@@ -1,7 +1,6 @@
 package grammar
 
 import (
-	"github.com/paulgriffiths/contextfree/datastruct"
 	"github.com/paulgriffiths/contextfree/types/symbols"
 	"github.com/paulgriffiths/contextfree/utils"
 	"io"
@@ -38,12 +37,12 @@ func (g *Grammar) TerminalComp(nt string) symbols.Symbol {
 
 // NonTerminalsSet returns an integer set containing the elements
 // 0...𝑛-1, where 𝑛 is the number of nonterminals.
-func (g *Grammar) NonTerminalsSet() datastruct.SetInt {
-	return datastruct.NewSetInt(utils.IntRange(len(g.NonTerminals))...)
+func (g *Grammar) NonTerminalsSet() utils.SetInt {
+	return utils.NewSetInt(utils.IntRange(len(g.NonTerminals))...)
 }
 
 // TerminalsSet returns an integer set containing the elements
 // 0...𝑛-1, where 𝑛 is the number of terminals.
-func (g *Grammar) TerminalsSet() datastruct.SetInt {
-	return datastruct.NewSetInt(utils.IntRange(len(g.Terminals))...)
+func (g *Grammar) TerminalsSet() utils.SetInt {
+	return utils.NewSetInt(utils.IntRange(len(g.Terminals))...)
 }

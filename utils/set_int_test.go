@@ -1,30 +1,30 @@
-package datastruct_test
+package utils_test
 
 import (
-	"github.com/paulgriffiths/contextfree/datastruct"
+	"github.com/paulgriffiths/contextfree/utils"
 	"testing"
 )
 
 var (
-	siE    = datastruct.NewSetInt()
-	si0    = datastruct.NewSetInt(0)
-	si1    = datastruct.NewSetInt(1)
-	si2    = datastruct.NewSetInt(2)
-	si4    = datastruct.NewSetInt(4)
-	si01   = datastruct.NewSetInt(0, 1)
-	si10   = datastruct.NewSetInt(1, 0)
-	si02   = datastruct.NewSetInt(0, 2)
-	si12   = datastruct.NewSetInt(1, 2)
-	si23   = datastruct.NewSetInt(2, 3)
-	si34   = datastruct.NewSetInt(3, 4)
-	si012  = datastruct.NewSetInt(0, 1, 2)
-	si123  = datastruct.NewSetInt(1, 2, 3)
-	si1234 = datastruct.NewSetInt(1, 2, 3, 4)
+	siE    = utils.NewSetInt()
+	si0    = utils.NewSetInt(0)
+	si1    = utils.NewSetInt(1)
+	si2    = utils.NewSetInt(2)
+	si4    = utils.NewSetInt(4)
+	si01   = utils.NewSetInt(0, 1)
+	si10   = utils.NewSetInt(1, 0)
+	si02   = utils.NewSetInt(0, 2)
+	si12   = utils.NewSetInt(1, 2)
+	si23   = utils.NewSetInt(2, 3)
+	si34   = utils.NewSetInt(3, 4)
+	si012  = utils.NewSetInt(0, 1, 2)
+	si123  = utils.NewSetInt(1, 2, 3)
+	si1234 = utils.NewSetInt(1, 2, 3, 4)
 )
 
 func TestSetIntEquals(t *testing.T) {
 	testCases := []struct {
-		a, b  datastruct.SetInt
+		a, b  utils.SetInt
 		equal bool
 	}{
 		{siE, siE, true}, {siE, si0, false}, {si0, siE, false},
@@ -50,7 +50,7 @@ func TestSetIntLength(t *testing.T) {
 	}
 
 	for n, tc := range testCases {
-		s := datastruct.NewSetInt(tc.values...)
+		s := utils.NewSetInt(tc.values...)
 		if r := s.Length(); r != tc.length {
 			t.Errorf("case %d, got %d, want %d", n+1, r, tc.length)
 		}
@@ -77,7 +77,7 @@ func TestSetIntContains(t *testing.T) {
 	}
 
 	for n, tc := range testCases {
-		s := datastruct.NewSetInt(tc.values...)
+		s := utils.NewSetInt(tc.values...)
 		for m, c := range tc.contains {
 			if r := s.Contains(m); r != c {
 				t.Errorf("case (%d,%d), got %t, want %t", n+1, m+1, r, c)
@@ -88,7 +88,7 @@ func TestSetIntContains(t *testing.T) {
 
 func TestSetIntUnion(t *testing.T) {
 	testCases := []struct {
-		a, b, u datastruct.SetInt
+		a, b, u utils.SetInt
 	}{
 		{si12, si34, si1234}, {si12, si23, si123}, {si12, si12, si12},
 		{si12, si1, si12}, {si12, siE, si12}, {siE, siE, siE},
@@ -103,7 +103,7 @@ func TestSetIntUnion(t *testing.T) {
 
 func TestSetIntIntersection(t *testing.T) {
 	testCases := []struct {
-		a, b, i datastruct.SetInt
+		a, b, i utils.SetInt
 	}{
 		{si12, si34, siE}, {si12, si23, si2}, {si12, si12, si12},
 		{si12, si1, si1}, {si12, siE, siE}, {siE, siE, siE},
@@ -118,7 +118,7 @@ func TestSetIntIntersection(t *testing.T) {
 
 func TestSetIntDifference(t *testing.T) {
 	testCases := []struct {
-		a, b, i datastruct.SetInt
+		a, b, i utils.SetInt
 	}{
 		{si1234, si34, si12}, {si1234, si123, si4},
 		{si012, si12, si0}, {si1234, si1234, siE},

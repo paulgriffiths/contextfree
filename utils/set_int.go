@@ -1,4 +1,4 @@
-package datastruct
+package utils
 
 // SetInt implements a set of integers.
 type SetInt map[int]bool

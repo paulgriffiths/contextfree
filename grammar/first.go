@@ -1,8 +1,8 @@
 package grammar
 
 import (
-	"github.com/paulgriffiths/contextfree/datastruct"
 	"github.com/paulgriffiths/contextfree/types/symbols"
+	"github.com/paulgriffiths/contextfree/utils"
 )
 
 // First returns the set of terminals that begin strings derived
@@ -86,7 +86,7 @@ func (g *Grammar) calcFirsts() {
 // firstInternal performs one complete cycle of First set
 // computation rules for a given symbol.
 func (g *Grammar) firstInternal(sym symbols.Symbol,
-	nullables datastruct.SetInt,
+	nullables utils.SetInt,
 	checked map[symbols.Symbol]bool) symbols.SetSymbol {
 
 	set := symbols.NewSetSymbol()
@@ -130,9 +130,9 @@ func (g *Grammar) firstInternal(sym symbols.Symbol,
 }
 
 // calcNullables returns the set of nonterminals which can derive 𝜀.
-func (g *Grammar) calcNullables() datastruct.SetInt {
-	nullable := datastruct.NewSetInt()
-	newNulls := datastruct.NewSetInt()
+func (g *Grammar) calcNullables() utils.SetInt {
+	nullable := utils.NewSetInt()
+	newNulls := utils.NewSetInt()
 
 	// Add to set any nonterminal 𝐴 where 𝐴 → 𝜀 is a production.
 

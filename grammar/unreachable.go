@@ -1,7 +1,7 @@
 package grammar
 
 import (
-	"github.com/paulgriffiths/contextfree/datastruct"
+	"github.com/paulgriffiths/contextfree/utils"
 	"sort"
 )
 
@@ -11,8 +11,8 @@ func (g *Grammar) Unreachable() []int {
 
 	// Begin search from start symbol 𝑆, which is always reachable.
 
-	reachable := datastruct.NewSetInt(0)
-	visitNext := datastruct.NewSetInt(0)
+	reachable := utils.NewSetInt(0)
+	visitNext := utils.NewSetInt(0)
 
 	for !visitNext.IsEmpty() {
 
@@ -21,7 +21,7 @@ func (g *Grammar) Unreachable() []int {
 		// reachable via those productions which have not previously
 		// been reached.
 
-		reached := datastruct.NewSetInt()
+		reached := utils.NewSetInt()
 		for _, nt := range visitNext.Elements() {
 			for _, str := range g.Prods[nt] {
 				for _, sym := range str {
