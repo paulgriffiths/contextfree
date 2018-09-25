@@ -144,25 +144,25 @@ The `-lex` option shows the output from the lexer for a given string:
 	T      : T `\*` F | F
 	F      : `\(` E `\)` | Digits
 	Digits : `[[:digit:]]+`
-	paul@horus:grammartool$ grammartool -f 1.grammar -lex -i='((3+4)*5)*(6+8)'
+	paul@horus:grammartool$ grammartool -f 1.grammar -lex -i='((32 + 443) * 812) * (52 + 918)'
 	T  n Lexeme
 	-  - ------
 	2  0 '('
 	2  1 '('
-	4  2 '3'
-	0  3 '+'
-	4  4 '4'
-	3  5 ')'
-	1  6 '*'
-	4  7 '5'
-	3  8 ')'
-	1  9 '*'
-	2 10 '('
-	4 11 '6'
-	0 12 '+'
-	4 13 '8'
-	3 14 ')'
-	paul@horus:grammartool$
+	4  2 '32'
+	0  5 '+'
+	4  7 '443'
+	3 10 ')'
+	1 12 '*'
+	4 14 '812'
+	3 17 ')'
+	1 19 '*'
+	2 21 '('
+	4 22 '52'
+	0 25 '+'
+	4 27 '918'
+	3 30 ')'
+	paul@horus:grammartool$ 
 
 ### Validating regular expressions
 
