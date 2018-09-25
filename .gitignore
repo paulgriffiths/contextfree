@@ -3,3 +3,4 @@
 *~
 cmd/grammar_info/grammar_info
 cmd/grammar_info/*.grammar
+cmd/eval/eval

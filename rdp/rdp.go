@@ -5,6 +5,7 @@ import (
 	"github.com/paulgriffiths/contextfree/tree"
 	"github.com/paulgriffiths/contextfree/types/symbols"
 	"github.com/paulgriffiths/lexer"
+	"io"
 	"strings"
 )
 
@@ -28,6 +29,23 @@ func New(g *grammar.Grammar) (*Rdp, error) {
 // context-free grammar representation in a text file.
 func FromFile(filename string) (*Rdp, error) {
 	g, gerr := grammar.FromFile(filename)
+	if gerr != nil {
+		return nil, gerr
+	}
+
+	l, lerr := lexer.New(g.Terminals)
+	if lerr != nil {
+		return nil, lerr
+	}
+
+	newParser := Rdp{g, l}
+	return &newParser, nil
+}
+
+// FromReader constructs a recursive descent parser from a
+// context-free grammar representation in an io.Reader
+func FromReader(reader io.Reader) (*Rdp, error) {
+	g, gerr := grammar.New(reader)
 	if gerr != nil {
 		return nil, gerr
 	}

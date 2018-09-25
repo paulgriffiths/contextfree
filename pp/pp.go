@@ -5,6 +5,7 @@ import (
 	"github.com/paulgriffiths/contextfree/tree"
 	"github.com/paulgriffiths/contextfree/types/symbols"
 	"github.com/paulgriffiths/lexer"
+	"io"
 	"strings"
 )
 
@@ -16,20 +17,38 @@ type Pp struct {
 }
 
 // New constructs a new predictive parser for a context-free grammar.
-func New(g *grammar.Grammar) *Pp {
+func New(g *grammar.Grammar) (*Pp, error) {
 	table := makePPTable(g)
 	l, err := lexer.New(g.Terminals)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 	newParser := Pp{g, table, l}
-	return &newParser
+	return &newParser, nil
 }
 
 // FromFile constructs a predictive parser from a context-free grammar
 // representation in a text file.
 func FromFile(filename string) (*Pp, error) {
 	g, gerr := grammar.FromFile(filename)
+	if gerr != nil {
+		return nil, gerr
+	}
+
+	table := makePPTable(g)
+	l, lerr := lexer.New(g.Terminals)
+	if lerr != nil {
+		return nil, lerr
+	}
+
+	newParser := Pp{g, table, l}
+	return &newParser, nil
+}
+
+// FromReader constructs a predictive parser from a context-free grammar
+// representation in an io.Reader
+func FromReader(reader io.Reader) (*Pp, error) {
+	g, gerr := grammar.New(reader)
 	if gerr != nil {
 		return nil, gerr
 	}

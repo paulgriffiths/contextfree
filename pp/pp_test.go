@@ -13,7 +13,11 @@ func TestTable(t *testing.T) {
 		return
 	}
 
-	pp := pp.New(g)
+	pp, err := pp.New(g)
+	if err != nil {
+		t.Errorf("couldn't get parser for file %s: %v", tgArithNlr, err)
+		return
+	}
 
 	matrix := [][]int{
 		//    +  *  (  )  n  $
