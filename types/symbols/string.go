@@ -54,6 +54,12 @@ func (s String) IsLast(n int) bool {
 	return n == len(s)-1
 }
 
+// Within returns true if the provided index refers to any symbol
+// of the string except the last symbol.
+func (s String) Within(n int) bool {
+	return len(s) <= n
+}
+
 // Copy makes a copy of a string.
 func (s String) Copy() String {
 	newString := make(String, len(s))
