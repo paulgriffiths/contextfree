@@ -53,3 +53,10 @@ func (s String) HasOnlyTerminals() bool {
 func (s String) IsLast(n int) bool {
 	return n == len(s)-1
 }
+
+// Copy makes a copy of a string.
+func (s String) Copy() String {
+	newString := make(String, len(s))
+	copy(newString, s)
+	return newString
+}

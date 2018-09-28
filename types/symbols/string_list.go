@@ -18,3 +18,12 @@ func (l StringList) HasEmpty() bool {
 	}
 	return false
 }
+
+// Copy makes a copy of a StringList.
+func (l StringList) Copy() StringList {
+	newList := make(StringList, len(l))
+	for n := range l {
+		newList[n] = l[n].Copy()
+	}
+	return newList
+}
