@@ -21,7 +21,6 @@ var goToTestCases = []struct {
 			Item{2, 1, 0}, // 𝑇 ⟶  ⋅𝐹
 			Item{3, 0, 0}, // 𝐹 ⟶  ⋅( 𝐸 )
 			Item{3, 1, 0}, // 𝐹 ⟶  ⋅𝐷
-			Item{4, 0, 0}, // 𝐷 ⟶  ⋅n
 		),
 		symbols.NewTerminal(0), // +
 	},
@@ -32,7 +31,6 @@ var goToTestCases = []struct {
 			Item{2, 1, 0}, // 𝑇 ⟶  ⋅𝐹
 			Item{3, 0, 0}, // 𝐹 ⟶  ⋅( 𝐸 )
 			Item{3, 1, 0}, // 𝐹 ⟶  ⋅𝐷
-			Item{4, 0, 0}, // 𝐷 ⟶  ⋅n
 		),
 		NewSetItem(
 			Item{1, 0, 3}, // 𝐸 ⟶  𝐸 + 𝑇⋅

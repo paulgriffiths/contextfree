@@ -7,10 +7,10 @@ import (
 )
 
 var tc = grammar.Grammar{
-	NonTerminals: []string{"S", "E", "T", "F", "Digits"},
+	NonTerminals: []string{"S", "E", "T", "F"},
 	Terminals:    []string{"\\+", "\\*", "\\(", "\\)", "[[:digit:]]+"},
 	NtTable: map[string]int{
-		"S": 0, "E": 1, "T": 2, "F": 3, "Digits": 4,
+		"S": 0, "E": 1, "T": 2, "F": 3,
 	},
 	TTable: map[string]int{
 		"\\+": 0, "\\*": 1, "\\(": 2, "\\)": 3, "[[:digit:]]+": 4,
@@ -47,11 +47,6 @@ var tc = grammar.Grammar{
 				symbols.NewNonTerminal(1),
 				symbols.NewTerminal(3),
 			},
-			symbols.String{
-				symbols.NewNonTerminal(4),
-			},
-		},
-		{
 			symbols.String{
 				symbols.NewTerminal(4),
 			},

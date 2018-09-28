@@ -21,24 +21,24 @@ type grammarTestCase struct {
 
 var grammarTestCases = []grammarTestCase{
 	{
-		tgArithLr, true, 4, 5, 7,
-		[]string{"E", "T", "F", "Digits"},
+		tgArithLr, true, 3, 5, 6,
+		[]string{"E", "T", "F"},
 		[]string{"\\+", "\\*", "\\(", "\\)", "[[:digit:]]+"},
 		[]string{"E", "T"}, []string{"E", "T"},
 		[]string{}, []string{}, []string{},
 		[]string{},
 		[]string{},
 		map[string][]string{
-			"E":      []string{"\\(", "[[:digit:]]+"},
-			"T":      []string{"\\(", "[[:digit:]]+"},
-			"F":      []string{"\\(", "[[:digit:]]+"},
-			"Digits": []string{"[[:digit:]]+"},
+			"E": []string{"\\(", "[[:digit:]]+"},
+			"T": []string{"\\(", "[[:digit:]]+"},
+			"F": []string{"\\(", "[[:digit:]]+"},
+			//"Digits": []string{"[[:digit:]]+"},
 		},
 		map[string][]string{
-			"F":      []string{"\\+", "\\*", "\\)", "$"},
-			"T":      []string{"\\+", "\\*", "\\)", "$"},
-			"E":      []string{"\\+", "\\)", "$"},
-			"Digits": []string{"\\*", "\\+", "\\)", "$"},
+			"F": []string{"\\+", "\\*", "\\)", "$"},
+			"T": []string{"\\+", "\\*", "\\)", "$"},
+			"E": []string{"\\+", "\\)", "$"},
+			//"Digits": []string{"\\*", "\\+", "\\)", "$"},
 		},
 	},
 	{
