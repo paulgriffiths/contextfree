@@ -47,13 +47,27 @@ func (g *Grammar) TerminalsSet() utils.SetInt {
 	return utils.NewSetInt(utils.IntRange(len(g.Terminals))...)
 }
 
-// Symbols returns an array containing all the nonterminal and
+// Symbols returns a slice containing all the nonterminal and
 // terminal symbols in the grammar.
 func (g *Grammar) Symbols() []symbols.Symbol {
+	list := g.NonTerminalSymbols()
+	return append(list, g.TerminalSymbols()...)
+}
+
+// NonTerminalSymbols returns a slice containing all the nonterminal
+// symbols in the grammar.
+func (g *Grammar) NonTerminalSymbols() []symbols.Symbol {
 	list := []symbols.Symbol{}
 	for n := range g.NonTerminals {
 		list = append(list, symbols.NewNonTerminal(n))
 	}
+	return list
+}
+
+// TerminalSymbols returns a slice containing all the terminal
+// symbols in the grammar.
+func (g *Grammar) TerminalSymbols() []symbols.Symbol {
+	list := []symbols.Symbol{}
 	for n := range g.Terminals {
 		list = append(list, symbols.NewTerminal(n))
 	}

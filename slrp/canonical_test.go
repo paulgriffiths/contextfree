@@ -73,7 +73,7 @@ func TestCanonical(t *testing.T) {
 		return
 	}
 
-	c := canonical(g)
+	c := canonical(g.Augment())
 	if len(c) != len(canonicalTestCase) {
 		t.Errorf("length not same, got %d, want %d", len(c),
 			len(canonicalTestCase))
