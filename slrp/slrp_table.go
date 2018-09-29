@@ -47,9 +47,9 @@ func actionTable(c []SetItem, g *grammar.Grammar) [][][]Action {
 			} else if item == NewItem(0, 0, 1) {
 				t[i][nt] = append(t[i][nt], NewAccept())
 			} else if prod.AfterLast(dot) {
+				pn := g.ProductionNumber(item.Nt, item.Prod)
 				f := g.Follow(item.Nt)
 				for _, s := range f.Elements() {
-					pn := g.ProductionNumber(item.Nt, item.Prod)
 					if s.IsInputEnd() {
 						t[i][nt] = append(t[i][nt], NewReduce(pn))
 					} else {
