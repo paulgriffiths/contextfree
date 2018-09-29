@@ -73,3 +73,15 @@ func (g *Grammar) TerminalSymbols() []symbols.Symbol {
 	}
 	return list
 }
+
+// ProductionNumber returns an index for the specified production
+// for the specified nonterminal, the index representing the position
+// of the production in the list of all productions in the grammar in
+// the order they appear in the grammar.
+func (g *Grammar) ProductionNumber(nt, prod int) int {
+	n := 0
+	for i := 0; i < nt; i++ {
+		n += len(g.Prods[i])
+	}
+	return n + prod
+}

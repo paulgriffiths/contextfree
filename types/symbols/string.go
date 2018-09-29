@@ -54,10 +54,22 @@ func (s String) IsLast(n int) bool {
 	return n == len(s)-1
 }
 
+// AfterLast returns true if the provided index refers to the position
+// immediately after the last symbol of the string.
+func (s String) AfterLast(n int) bool {
+	return n == len(s)
+}
+
 // Within returns true if the provided index refers to any symbol
 // of the string except the last symbol.
 func (s String) Within(n int) bool {
 	return len(s) <= n
+}
+
+// NotLast returns true if the provided index refers to any symbol
+// of the string except the last symbol.
+func (s String) NotLast(n int) bool {
+	return n < len(s)
 }
 
 // Copy makes a copy of a string.

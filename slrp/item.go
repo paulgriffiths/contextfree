@@ -6,3 +6,8 @@ type Item struct {
 	Prod int
 	Dot  int
 }
+
+// NewItem creates a new item.
+func NewItem(n, p, d int) Item {
+	return Item{n, p, d}
+}

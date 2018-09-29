@@ -14,18 +14,18 @@ type Action struct {
 	S int
 }
 
-// NewActionShift creates a new shift action to the specified state.
-func NewActionShift(s int) Action {
+// NewShift creates a new shift action to the specified state.
+func NewShift(s int) Action {
 	return Action{actionShift, s}
 }
 
-// NewActionReduce creates a new reduce action to the specified state.
-func NewActionReduce(s int) Action {
+// NewReduce creates a new reduce action to the specified state.
+func NewReduce(s int) Action {
 	return Action{actionReduce, s}
 }
 
-// NewActionAccept creates a new accept action.
-func NewActionAccept() Action {
+// NewAccept creates a new accept action.
+func NewAccept() Action {
 	return Action{actionAccept, -1}
 }
 
@@ -42,4 +42,9 @@ func (a Action) IsReduce() bool {
 // IsAccept tests if an action is an accept action.
 func (a Action) IsAccept() bool {
 	return a.T == actionAccept
+}
+
+// Equals tests if an action is equal to another.
+func (a Action) Equals(other Action) bool {
+	return a.T == other.T && a.S == other.S
 }
