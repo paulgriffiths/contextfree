@@ -20,6 +20,7 @@ func NewTable(g *grammar.Grammar) Table {
 	return Table{c, actions, gotos}
 }
 
+// actionTable constructs the action columns of an SLR-parsing table.
 func actionTable(c []SetItem, g *grammar.Grammar) [][][]Action {
 	t := make([][][]Action, len(c))
 	for row := range t {
@@ -41,8 +42,7 @@ func actionTable(c []SetItem, g *grammar.Grammar) [][][]Action {
 				if !sym.IsTerminal() {
 					continue
 				}
-				gset := goTo(set, sym, g)
-				n := canonicalIndex(c, gset)
+				n := canonicalIndex(c, goTo(set, sym, g))
 				t[i][sym.I] = append(t[i][sym.I], NewShift(n))
 			} else if item == NewItem(0, 0, 1) {
 				t[i][nt] = append(t[i][nt], NewAccept())
@@ -63,6 +63,7 @@ func actionTable(c []SetItem, g *grammar.Grammar) [][][]Action {
 	return t
 }
 
+// goToTable constructs the goto columns of an SLR-parsing table.
 func goToTable(c []SetItem, g *grammar.Grammar) [][]int {
 	table := make([][]int, len(c))
 	for row := range table {
@@ -73,13 +74,9 @@ func goToTable(c []SetItem, g *grammar.Grammar) [][]int {
 	}
 
 	for setIndex, set := range c {
-		for symIndex, sym := range g.NonTerminalSymbols() {
-			if symIndex == 0 {
-				continue
-			}
-			gset := goTo(set, sym, g)
-			if !gset.IsEmpty() {
-				table[setIndex][symIndex] = canonicalIndex(c, gset)
+		for symIndex, sym := range g.NonTerminalSymbols()[1:] {
+			if gset := goTo(set, sym, g); !gset.IsEmpty() {
+				table[setIndex][symIndex+1] = canonicalIndex(c, gset)
 			}
 		}
 	}
@@ -87,6 +84,8 @@ func goToTable(c []SetItem, g *grammar.Grammar) [][]int {
 	return table
 }
 
+// canonicalIndex returns the index in the slice of canonical collection
+// of sets at which the provided set is located.
 func canonicalIndex(sets []SetItem, set SetItem) int {
 	for n, s := range sets {
 		if set.Equals(s) {
