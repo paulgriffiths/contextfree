@@ -46,3 +46,16 @@ func (g *Grammar) NonTerminalsSet() utils.SetInt {
 func (g *Grammar) TerminalsSet() utils.SetInt {
 	return utils.NewSetInt(utils.IntRange(len(g.Terminals))...)
 }
+
+// Symbols returns an array containing all the nonterminal and
+// terminal symbols in the grammar.
+func (g *Grammar) Symbols() []symbols.Symbol {
+	list := []symbols.Symbol{}
+	for n := range g.NonTerminals {
+		list = append(list, symbols.NewNonTerminal(n))
+	}
+	for n := range g.Terminals {
+		list = append(list, symbols.NewTerminal(n))
+	}
+	return list
+}
