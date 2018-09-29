@@ -85,3 +85,15 @@ func (g *Grammar) ProductionNumber(nt, prod int) int {
 	}
 	return n + prod
 }
+
+// ProductionFromNumber takes a production index (such as one
+// returned from ProductionNumber) and converts it to a nonterminal
+// and production index suitable for indexing Grammar.Prods.
+func (g *Grammar) ProductionFromNumber(n int) (int, int) {
+	nt := 0
+	for n >= len(g.Prods[nt]) {
+		n -= len(g.Prods[nt])
+		nt++
+	}
+	return nt, n
+}

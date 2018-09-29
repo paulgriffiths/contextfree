@@ -9,6 +9,7 @@ type Table struct {
 	C []SetItem
 	A [][][]Action
 	G [][]int
+	a *grammar.Grammar
 }
 
 // NewTable constructs an SLR-parsing table for a grammar.
@@ -17,7 +18,7 @@ func NewTable(g *grammar.Grammar) Table {
 	c := canonical(a)
 	actions := actionTable(c, a)
 	gotos := goToTable(c, a)
-	return Table{c, actions, gotos}
+	return Table{c, actions, gotos, a}
 }
 
 // actionTable constructs the action columns of an SLR-parsing table.
