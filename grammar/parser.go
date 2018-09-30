@@ -111,7 +111,7 @@ func getNextBody(g *Grammar, t lexer.TokenList) (symbols.String, int, ParseErr) 
 		if tokenIndexIs(t, 1, tNonT, tT) {
 			return nil, 0, ParseError{ParseErrEmptyNotAlone, t[1].Index}
 		}
-		return symbols.String{symbols.NewSymbolEmpty()}, 1, nil
+		return symbols.String{}, 1, nil
 	}
 
 	syms := symbols.String{}

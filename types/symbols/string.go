@@ -8,12 +8,6 @@ func (s String) IsEmpty() bool {
 	return len(s) == 0
 }
 
-// IsEmptyString checks if a string of grammar symbols contains
-// only a single empty symbol.
-func (s String) IsEmptyString() bool {
-	return len(s) == 1 && s[0].T == SymbolEmpty
-}
-
 // IsNonTerminal checks if a string of grammar symbols contains
 // only a single nonterminal.
 func (s String) IsNonTerminal() bool {

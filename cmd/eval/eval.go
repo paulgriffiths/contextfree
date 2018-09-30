@@ -33,7 +33,12 @@ const (
 // to this function will always represent a nonterminal.
 func eval(t *tree.Node, n ...float64) float64 {
 	ch := t.Children
-	sym := ch[0].Sym // Nonterminals always have at least one child.
+
+	if len(ch) == 0 {
+		return n[0]
+	}
+
+	sym := ch[0].Sym
 
 	switch t.Sym.I {
 	case ntE:
@@ -48,8 +53,6 @@ func eval(t *tree.Node, n ...float64) float64 {
 			return eval(ch[2], n[0]+eval(ch[1]))
 		case sym.IsTerminal() && sym.I == tMinus:
 			return eval(ch[2], n[0]-eval(ch[1]))
-		case sym.IsEmpty():
-			return n[0]
 		}
 
 	case ntTp:
@@ -58,8 +61,6 @@ func eval(t *tree.Node, n ...float64) float64 {
 			return eval(ch[2], n[0]*eval(ch[1]))
 		case sym.IsTerminal() && sym.I == tDivide:
 			return eval(ch[2], n[0]/eval(ch[1]))
-		case sym.IsEmpty():
-			return n[0]
 		}
 
 	case ntF:

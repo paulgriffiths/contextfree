@@ -12,7 +12,7 @@ func (l StringList) IsEmpty() bool {
 // consisting solely of the empty symbol.
 func (l StringList) HasEmpty() bool {
 	for _, str := range l {
-		if str.IsEmptyString() {
+		if str.IsEmpty() {
 			return true
 		}
 	}

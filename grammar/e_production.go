@@ -9,9 +9,11 @@ func (g *Grammar) HasEProduction() bool {
 // have e-productions.
 func (g *Grammar) NonTerminalsWithEProductions() []int {
 	list := []int{}
-	for n, prod := range g.Prods {
-		if prod.HasEmpty() {
-			list = append(list, n)
+	for nt, prods := range g.Prods {
+		for _, prod := range prods {
+			if prod.IsEmpty() {
+				list = append(list, nt)
+			}
 		}
 	}
 	return list

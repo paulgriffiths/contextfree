@@ -86,8 +86,6 @@ func (r Rdp) parseComp(t lexer.TokenList, sym symbols.Symbol) (*tree.Node, int) 
 		if len(t) > 0 && sym.I == t[0].ID {
 			node, numTerms = tree.NewNode(sym, t[0].Value, nil), 1
 		}
-	case symbols.SymbolEmpty:
-		node = tree.NewNode(sym, "e", nil)
 	}
 
 	return node, numTerms
@@ -109,9 +107,13 @@ func (r Rdp) parseNT(t lexer.TokenList, nt int) (*tree.Node, int) {
 }
 
 // parseBody parses a production body.
-func (r Rdp) parseBody(t lexer.TokenList, body []symbols.Symbol) ([]*tree.Node, int) {
+func (r Rdp) parseBody(t lexer.TokenList, body symbols.String) ([]*tree.Node, int) {
 	var children []*tree.Node
 	matchLength := 0
+
+	if body.IsEmpty() {
+		return []*tree.Node{}, 0
+	}
 
 	for _, symbol := range body {
 		node, numTerms := r.parseComp(t[matchLength:], symbol)

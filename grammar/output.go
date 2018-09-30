@@ -25,13 +25,16 @@ func (g *Grammar) Output(writer io.Writer) {
 					s = fmt.Sprintf(" %s", g.NonTerminals[sym.I])
 				case sym.IsTerminal():
 					s = fmt.Sprintf(" `%s`", g.Terminals[sym.I])
-				case sym.IsEmpty():
-					s = " e"
 				default:
 					panic("unexpected str component")
 				}
 				writer.Write([]byte(s))
 			}
+
+			if str.IsEmpty() {
+				writer.Write([]byte(" e"))
+			}
+
 			writer.Write([]byte("\n"))
 		}
 	}

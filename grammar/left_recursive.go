@@ -6,7 +6,7 @@ func (g *Grammar) NonTerminalsImmediatelyLeftRecursive() []int {
 	list := []int{}
 	for n := range g.NonTerminals {
 		for _, str := range g.Prods[n] {
-			if str[0].IsNonTerminal() && str[0].I == n {
+			if !str.IsEmpty() && str[0].IsNonTerminal() && str[0].I == n {
 				list = append(list, n)
 				break
 			}
@@ -44,7 +44,7 @@ func (g *Grammar) lrInternal(nt, interNt int, checked map[int]bool) bool {
 	checked[interNt] = true
 
 	for _, str := range g.Prods[interNt] {
-		if str[0].IsNonTerminal() {
+		if !str.IsEmpty() && str[0].IsNonTerminal() {
 			if str[0].I == nt {
 				return true
 			} else if g.lrInternal(nt, str[0].I, checked) {

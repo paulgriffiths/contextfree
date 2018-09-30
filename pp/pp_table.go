@@ -47,7 +47,7 @@ func buildTable(g *grammar.Grammar, m ppTable) {
 			// to m[𝛢,$], too.
 
 			follow := g.Follow(nt)
-			if first.ContainsEmpty() || body.IsEmptyString() {
+			if first.ContainsEmpty() || body.IsEmpty() {
 				for _, c := range follow.Elements() {
 					if c.IsTerminal() {
 						m[nt][c.I] = append(m[nt][c.I], body)

@@ -46,14 +46,16 @@ func (t *Node) WriteBracketed(writer io.Writer, opts ...string) {
 	switch t.Sym.T {
 	case symbols.SymbolTerminal:
 		writer.Write([]byte(fmt.Sprintf("%s%s%s", qc, t.Value, qc)))
-	case symbols.SymbolEmpty:
-		writer.Write([]byte(fmt.Sprintf("e")))
 	case symbols.SymbolNonTerminal:
 		writer.Write([]byte(fmt.Sprintf("%s%s ", ob, t.Value)))
-		for n, child := range t.Children {
-			child.WriteBracketed(writer, qc, ob, cb)
-			if n < len(t.Children)-1 {
-				writer.Write([]byte(fmt.Sprintf(" ")))
+		if len(t.Children) == 0 {
+			writer.Write([]byte(fmt.Sprintf("e")))
+		} else {
+			for n, child := range t.Children {
+				child.WriteBracketed(writer, qc, ob, cb)
+				if n < len(t.Children)-1 {
+					writer.Write([]byte(fmt.Sprintf(" ")))
+				}
 			}
 		}
 		writer.Write([]byte(fmt.Sprintf("%s", cb)))

@@ -16,14 +16,16 @@ func (g *Grammar) First(syms ...symbols.Symbol) symbols.SetSymbol {
 	// return an empty set. For a single nonterminal, return the
 	// precomputed set.
 
+	if len(syms) == 0 {
+		return symbols.NewSetSymbol()
+	}
+
 	if syms[0].IsTerminal() {
 		return symbols.NewSetSymbol(syms[0])
 	}
 
 	if len(syms) == 1 {
-		if syms[0].IsEmpty() {
-			return symbols.NewSetSymbol()
-		} else if syms[0].IsNonTerminal() {
+		if syms[0].IsNonTerminal() {
 			return g.firsts[syms[0].I]
 		}
 		panic("unexpected symbol passed to First")
@@ -112,7 +114,7 @@ func (g *Grammar) firstInternal(sym symbols.Symbol,
 	checked[sym] = true
 
 	for _, body := range g.Prods[sym.I] {
-		if body.IsEmptyString() {
+		if body.IsEmpty() {
 			set.InsertEmpty()
 			continue
 		}
@@ -136,9 +138,11 @@ func (g *Grammar) calcNullables() utils.SetInt {
 
 	// Add to set any nonterminal 𝐴 where 𝐴 → 𝜀 is a production.
 
-	for n, prod := range g.Prods {
-		if prod.HasEmpty() {
-			nullable.Insert(n)
+	for nt, prods := range g.Prods {
+		for _, prod := range prods {
+			if prod.IsEmpty() {
+				nullable.Insert(nt)
+			}
 		}
 	}
 

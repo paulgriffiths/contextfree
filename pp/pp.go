@@ -108,10 +108,9 @@ func (p Pp) parseNT(t lexer.TokenList, nt int) (*tree.Node, int) {
 		if str.IsEmpty() {
 			return nil, 0
 		}
-		if str[0].IsEmptyString() {
-			em := tree.NewNode(symbols.NewSymbolEmpty(), "e", nil)
+		if str[0].IsEmpty() {
 			term := tree.NewNode(symbols.NewNonTerminal(nt),
-				p.g.NonTerminals[nt], []*tree.Node{em})
+				p.g.NonTerminals[nt], []*tree.Node{})
 			return term, 0
 		}
 		panic("unexpected terminal condition")
@@ -124,6 +123,14 @@ func (p Pp) parseNT(t lexer.TokenList, nt int) (*tree.Node, int) {
 	str := p.Table[nt][t[0].ID]
 	if str.IsEmpty() {
 		return nil, 0
+	}
+
+	if str[0].IsEmpty() {
+		return tree.NewNode(
+			symbols.Symbol{symbols.SymbolNonTerminal, nt},
+			p.g.NonTerminals[nt],
+			[]*tree.Node{},
+		), 0
 	}
 
 	if children, numTerms := p.parseString(t, str[0]); children != nil {
