@@ -32,14 +32,7 @@ func FromFile(filename string) (*Rdp, error) {
 	if gerr != nil {
 		return nil, gerr
 	}
-
-	l, lerr := lexer.New(g.Terminals)
-	if lerr != nil {
-		return nil, lerr
-	}
-
-	newParser := Rdp{g, l}
-	return &newParser, nil
+	return New(g)
 }
 
 // FromReader constructs a recursive descent parser from a
@@ -49,14 +42,7 @@ func FromReader(reader io.Reader) (*Rdp, error) {
 	if gerr != nil {
 		return nil, gerr
 	}
-
-	l, lerr := lexer.New(g.Terminals)
-	if lerr != nil {
-		return nil, lerr
-	}
-
-	newParser := Rdp{g, l}
-	return &newParser, nil
+	return New(g)
 }
 
 // Parse parses input against a grammar and returns a parse tree,
@@ -74,8 +60,8 @@ func (r Rdp) Parse(input string) *tree.Node {
 	return nil
 }
 
-// parseComp parses a grammar symbol.
-func (r Rdp) parseComp(t lexer.TokenList, sym symbols.Symbol) (*tree.Node, int) {
+// parseSym parses a grammar symbol.
+func (r Rdp) parseSym(t lexer.TokenList, sym symbols.Symbol) (*tree.Node, int) {
 	var node *tree.Node
 	numTerms := 0
 
@@ -84,7 +70,7 @@ func (r Rdp) parseComp(t lexer.TokenList, sym symbols.Symbol) (*tree.Node, int) 
 		node, numTerms = r.parseNT(t, sym.I)
 	case symbols.SymbolTerminal:
 		if len(t) > 0 && sym.I == t[0].ID {
-			node, numTerms = tree.NewNode(sym, t[0].Value, nil), 1
+			node, numTerms = tree.New(sym, t[0].Value, nil), 1
 		}
 	}
 
@@ -95,7 +81,7 @@ func (r Rdp) parseComp(t lexer.TokenList, sym symbols.Symbol) (*tree.Node, int) 
 func (r Rdp) parseNT(t lexer.TokenList, nt int) (*tree.Node, int) {
 	for _, body := range r.g.Prods[nt] {
 		if children, numTerms := r.parseBody(t, body); children != nil {
-			return tree.NewNode(
+			return tree.New(
 				symbols.Symbol{symbols.SymbolNonTerminal, nt},
 				r.g.NonTerminals[nt],
 				children,
@@ -116,7 +102,7 @@ func (r Rdp) parseBody(t lexer.TokenList, body symbols.String) ([]*tree.Node, in
 	}
 
 	for _, symbol := range body {
-		node, numTerms := r.parseComp(t[matchLength:], symbol)
+		node, numTerms := r.parseSym(t[matchLength:], symbol)
 		if node == nil {
 			return nil, 0
 		}

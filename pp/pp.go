@@ -34,15 +34,7 @@ func FromFile(filename string) (*Pp, error) {
 	if gerr != nil {
 		return nil, gerr
 	}
-
-	table := makePPTable(g)
-	l, lerr := lexer.New(g.Terminals)
-	if lerr != nil {
-		return nil, lerr
-	}
-
-	newParser := Pp{g, table, l}
-	return &newParser, nil
+	return New(g)
 }
 
 // FromReader constructs a predictive parser from a context-free grammar
@@ -52,15 +44,7 @@ func FromReader(reader io.Reader) (*Pp, error) {
 	if gerr != nil {
 		return nil, gerr
 	}
-
-	table := makePPTable(g)
-	l, lerr := lexer.New(g.Terminals)
-	if lerr != nil {
-		return nil, lerr
-	}
-
-	newParser := Pp{g, table, l}
-	return &newParser, nil
+	return New(g)
 }
 
 // Parse parses input against a grammar and returns a parse tree,
@@ -71,27 +55,24 @@ func (p Pp) Parse(input string) *tree.Node {
 		return nil
 	}
 
-	node, n := p.parseNT(tokens, 0)
-	if n == tokens.Len() {
+	if node, n := p.parseNT(tokens, 0); n == tokens.Len() {
 		return node
 	}
 	return nil
 }
 
-// parseSymbol parses a production str sym.
-func (p Pp) parseSymbol(t lexer.TokenList, comp symbols.Symbol) (*tree.Node, int) {
+// parseSym parses a production str sym.
+func (p Pp) parseSym(t lexer.TokenList, sym symbols.Symbol) (*tree.Node, int) {
 	var node *tree.Node
 	numTerms := 0
 
-	switch comp.T {
+	switch sym.T {
 	case symbols.SymbolNonTerminal:
-		node, numTerms = p.parseNT(t, comp.I)
+		node, numTerms = p.parseNT(t, sym.I)
 	case symbols.SymbolTerminal:
-		if !t.IsEmpty() && t[0].ID == comp.I {
-			node, numTerms = tree.NewNode(comp, t[0].Value, nil), 1
+		if !t.IsEmpty() && t[0].ID == sym.I {
+			node, numTerms = tree.New(sym, t[0].Value, nil), 1
 		}
-	case symbols.SymbolEmpty:
-		node = tree.NewNode(comp, "e", nil)
 	}
 
 	return node, numTerms
@@ -109,7 +90,7 @@ func (p Pp) parseNT(t lexer.TokenList, nt int) (*tree.Node, int) {
 			return nil, 0
 		}
 		if str[0].IsEmpty() {
-			term := tree.NewNode(symbols.NewNonTerminal(nt),
+			term := tree.New(symbols.NewNonTerminal(nt),
 				p.g.NonTerminals[nt], []*tree.Node{})
 			return term, 0
 		}
@@ -125,16 +106,20 @@ func (p Pp) parseNT(t lexer.TokenList, nt int) (*tree.Node, int) {
 		return nil, 0
 	}
 
+	// No need to parse the body if it's empty.
+
 	if str[0].IsEmpty() {
-		return tree.NewNode(
+		return tree.New(
 			symbols.Symbol{symbols.SymbolNonTerminal, nt},
 			p.g.NonTerminals[nt],
 			[]*tree.Node{},
 		), 0
 	}
 
+	// Production body isn't empty, so parse it.
+
 	if children, numTerms := p.parseString(t, str[0]); children != nil {
-		return tree.NewNode(
+		return tree.New(
 			symbols.Symbol{symbols.SymbolNonTerminal, nt},
 			p.g.NonTerminals[nt],
 			children,
@@ -150,7 +135,7 @@ func (p Pp) parseString(t lexer.TokenList, str symbols.String) ([]*tree.Node, in
 	matchLength := 0
 
 	for _, sym := range str {
-		node, numTerms := p.parseSymbol(t[matchLength:], sym)
+		node, numTerms := p.parseSym(t[matchLength:], sym)
 		if node == nil {
 			return nil, 0
 		}

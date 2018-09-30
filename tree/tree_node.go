@@ -13,8 +13,8 @@ type Node struct {
 	Children []*Node
 }
 
-// NewNode creates a new parse tree node.
-func NewNode(sym symbols.Symbol, value string, children []*Node) *Node {
+// New creates a new parse tree node.
+func New(sym symbols.Symbol, value string, children []*Node) *Node {
 	node := Node{sym, value, children}
 	return &node
 }

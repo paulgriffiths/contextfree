@@ -36,14 +36,7 @@ func FromFile(filename string) (*Slrp, error) {
 		return nil, gerr
 	}
 
-	table := NewTable(g)
-	l, lerr := lexer.New(g.Terminals)
-	if lerr != nil {
-		return nil, lerr
-	}
-
-	newParser := Slrp{g, table, l}
-	return &newParser, nil
+	return New(g)
 }
 
 // FromReader constructs a simple LR parser from a context-free grammar
@@ -53,15 +46,7 @@ func FromReader(reader io.Reader) (*Slrp, error) {
 	if gerr != nil {
 		return nil, gerr
 	}
-
-	table := NewTable(g)
-	l, lerr := lexer.New(g.Terminals)
-	if lerr != nil {
-		return nil, lerr
-	}
-
-	newParser := Slrp{g, table, l}
-	return &newParser, nil
+	return New(g)
 }
 
 // Parse parses input against a grammar and returns a parse tree,
@@ -80,13 +65,18 @@ func (p Slrp) Parse(input string) *tree.Node {
 
 	for {
 		var actionList []Action
+		var sym symbols.Symbol
+
+		// Check if we have a terminal, or if we're at end-of-input.
 
 		if n < len(tokens) {
-			sym := symbols.NewTerminal(tokens[n].ID)
+			sym = symbols.NewTerminal(tokens[n].ID)
 			actionList = p.t.A[stack.Peek()][sym.I]
 		} else {
 			actionList = p.t.A[stack.Peek()][len(p.t.M.Terminals)]
 		}
+
+		// Return nil if we don't have a valid action.
 
 		if actionList == nil || len(actionList) < 1 {
 			return nil
@@ -96,9 +86,7 @@ func (p Slrp) Parse(input string) *tree.Node {
 
 		if action.IsShift() {
 			stack.Push(action.S)
-			sym := symbols.NewTerminal(tokens[n].ID)
-			newNode := tree.Node{sym, tokens[n].Value, nil}
-			tstack.Push(&newNode)
+			tstack.Push(tree.New(sym, tokens[n].Value, nil))
 			n++
 		} else if action.IsReduce() {
 			nt, n := p.t.M.ProductionFromNumber(action.S)
@@ -106,18 +94,14 @@ func (p Slrp) Parse(input string) *tree.Node {
 			children := []*tree.Node{}
 			for i := 0; i < len(prod); i++ {
 				stack.Pop()
-				node := tstack.Pop()
-				children = append([]*tree.Node{node}, children...)
+				children = append([]*tree.Node{tstack.Pop()}, children...)
 			}
-			node := tree.Node{symbols.NewNonTerminal(nt - 1),
-				p.t.M.NonTerminals[nt], children}
-			tstack.Push(&node)
 			stack.Push(p.t.G[stack.Peek()][nt])
+			tstack.Push(tree.New(symbols.NewNonTerminal(nt-1),
+				p.t.M.NonTerminals[nt], children))
 		} else if action.IsAccept() {
-			node := tstack.Pop()
-			return node
+			return tstack.Pop()
 		}
 	}
-
-	return nil
+	panic("unexpected action")
 }
