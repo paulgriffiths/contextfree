@@ -12,4 +12,9 @@ var parserTestCases = []testCase{
 		[]string{"3", "3+4", "3+4*5", "(3+4)*5", "  (3 +   4) * 5  "},
 		[]string{"", "+", "3+", "-3", "(3+4*5"},
 	},
+	{
+		tgSlrE,
+		[]string{"ab"},
+		[]string{"a", "b", ""},
+	},
 }

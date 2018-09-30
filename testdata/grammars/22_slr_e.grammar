@@ -1,0 +1,4 @@
+# An SLR(1) grammar with an e-production.
+
+S : `a` `b` A
+A : e

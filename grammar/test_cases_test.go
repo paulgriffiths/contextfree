@@ -482,4 +482,22 @@ var grammarTestCases = []grammarTestCase{
 			"Opener":         []string{"$"},
 		},
 	},
+	{
+		tgSlrE, false, 2, 2, 2,
+		[]string{"S", "A"},
+		[]string{"a", "b"},
+		[]string{},
+		[]string{},
+		[]string{}, []string{"A"}, []string{"A"},
+		[]string{},
+		[]string{},
+		map[string][]string{
+			"S": []string{"a"},
+			"A": []string{""},
+		},
+		map[string][]string{
+			"S": []string{"$"},
+			"A": []string{"$"},
+		},
+	},
 }

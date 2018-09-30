@@ -60,6 +60,12 @@ func TestParseWriteBracketed(t *testing.T) {
 			[]string{"", "[", "]"},
 			"[E [T [T [F ( [E [E [T [F 3]]] + [T [F 4]]] )]] * [F 5]]]",
 		},
+		{
+			tgSlrE,
+			"ab",
+			[]string{"", "[", "]"},
+			"[S a b [A e]]",
+		},
 	}
 
 	for n, tc := range testCases {

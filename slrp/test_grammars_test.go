@@ -23,6 +23,7 @@ var tgUnreachable2 = tgFilePrefix + "18_unreachable_2.grammar"
 var tgUnproductive1 = tgFilePrefix + "19_unproductive_1.grammar"
 var tgUnproductive2 = tgFilePrefix + "20_unproductive_2.grammar"
 var tgAdventure = tgFilePrefix + "21_adventure.grammar"
+var tgSlrE = tgFilePrefix + "22_slr_e.grammar"
 
 var tgOutArithLrRaw = tgFilePrefix + "output/01_arith_lr_raw.grammar"
 var tgOutArithNlrRaw = tgFilePrefix + "output/02_arith_nlr_raw.grammar"
