@@ -72,19 +72,20 @@ func (p Slrp) Parse(input string) *tree.Node {
 		return nil
 	}
 
-	node := tree.Node{symbols.NewNonTerminal(0), "Success", nil}
 	n := 0
 
 	stack := stacks.NewStackInt()
 	stack.Push(0)
+	tstack := NewStackNode()
 
 	for {
 		var actionList []Action
+
 		if n < len(tokens) {
 			sym := symbols.NewTerminal(tokens[n].ID)
 			actionList = p.t.A[stack.Peek()][sym.I]
 		} else {
-			actionList = p.t.A[stack.Peek()][len(p.t.a.Terminals)]
+			actionList = p.t.A[stack.Peek()][len(p.t.M.Terminals)]
 		}
 
 		if actionList == nil || len(actionList) < 1 {
@@ -95,16 +96,26 @@ func (p Slrp) Parse(input string) *tree.Node {
 
 		if action.IsShift() {
 			stack.Push(action.S)
+			sym := symbols.NewTerminal(tokens[n].ID)
+			newNode := tree.Node{sym, tokens[n].Value, nil}
+			tstack.Push(&newNode)
 			n++
 		} else if action.IsReduce() {
-			nt, n := p.t.a.ProductionFromNumber(action.S)
-			prod := p.t.a.Prods[nt][n]
+			nt, n := p.t.M.ProductionFromNumber(action.S)
+			prod := p.t.M.Prods[nt][n]
+			children := []*tree.Node{}
 			for i := 0; i < len(prod); i++ {
 				stack.Pop()
+				node := tstack.Pop()
+				children = append([]*tree.Node{node}, children...)
 			}
+			node := tree.Node{symbols.NewNonTerminal(nt - 1),
+				p.t.M.NonTerminals[nt], children}
+			tstack.Push(&node)
 			stack.Push(p.t.G[stack.Peek()][nt])
 		} else if action.IsAccept() {
-			return &node
+			node := tstack.Pop()
+			return node
 		}
 	}
 

@@ -9,7 +9,7 @@ type Table struct {
 	C []SetItem
 	A [][][]Action
 	G [][]int
-	a *grammar.Grammar
+	M *grammar.Grammar
 }
 
 // NewTable constructs an SLR-parsing table for a grammar.
