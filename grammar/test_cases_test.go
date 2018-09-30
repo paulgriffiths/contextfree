@@ -17,6 +17,12 @@ type grammarTestCase struct {
 	unproductive             []string
 	firsts                   map[string][]string
 	follows                  map[string][]string
+	isLLK                    bool
+	isLL1                    bool
+	isLR0                    bool
+	isSLR1                   bool
+	isLALR1                  bool
+	isLR1                    bool
 }
 
 var grammarTestCases = []grammarTestCase{
@@ -40,6 +46,7 @@ var grammarTestCases = []grammarTestCase{
 			"E": []string{"\\+", "\\)", "$"},
 			//"Digits": []string{"\\*", "\\+", "\\)", "$"},
 		},
+		false, false, false, true, true, true,
 	},
 	{
 		tgArithNlr, false, 6, 5, 9,
@@ -65,6 +72,7 @@ var grammarTestCases = []grammarTestCase{
 			"T'":     []string{"\\+", "\\)", "$"},
 			"Digits": []string{"\\*", "\\+", "\\)", "$"},
 		},
+		true, true, true, true, true, true,
 	},
 	{
 		tgArithAmbig, true, 2, 5, 5,
@@ -82,6 +90,7 @@ var grammarTestCases = []grammarTestCase{
 			"E":      []string{"\\*", "\\+", "\\)", "$"},
 			"Digits": []string{"\\*", "\\+", "\\)", "$"},
 		},
+		false, false, false, false, false, false,
 	},
 	{
 		tgBalParens1, true, 1, 2, 2,
@@ -97,6 +106,7 @@ var grammarTestCases = []grammarTestCase{
 		map[string][]string{
 			"S": []string{"\\(", "\\)", "$"},
 		},
+		false, false, false, false, false, false,
 	},
 	{
 		tgBalParens2, false, 1, 2, 2,
@@ -112,6 +122,7 @@ var grammarTestCases = []grammarTestCase{
 		map[string][]string{
 			"S": []string{"\\)", "$"},
 		},
+		true, true, true, true, true, true,
 	},
 	{
 		tgZeroOne, false, 1, 3, 2,
@@ -127,6 +138,7 @@ var grammarTestCases = []grammarTestCase{
 		map[string][]string{
 			"S": []string{"1", "$"},
 		},
+		true, true, true, true, true, true,
 	},
 	{
 		tgIndirectLr1, true, 2, 4, 5,
@@ -144,6 +156,7 @@ var grammarTestCases = []grammarTestCase{
 			"S": []string{"d", "$"},
 			"A": []string{"a", "c"},
 		},
+		false, false, false, true, true, true,
 	},
 	{
 		tgIndirectLr2, true, 4, 5, 8,
@@ -165,6 +178,7 @@ var grammarTestCases = []grammarTestCase{
 			"B": []string{"c"},
 			"C": []string{"d"},
 		},
+		false, false, false, true, true, true,
 	},
 	{
 		tgIndirectLr3, true, 5, 6, 10,
@@ -189,6 +203,7 @@ var grammarTestCases = []grammarTestCase{
 			"C": []string{"d"},
 			"D": []string{"e"},
 		},
+		false, false, false, true, true, true,
 	},
 	{
 		tgCycle1, true, 1, 2, 3,
@@ -204,6 +219,7 @@ var grammarTestCases = []grammarTestCase{
 		map[string][]string{
 			"S": []string{"$"},
 		},
+		false, false, false, false, false, false,
 	},
 	{
 		tgCycle2, true, 2, 4, 6,
@@ -221,6 +237,7 @@ var grammarTestCases = []grammarTestCase{
 			"S": []string{"$"},
 			"A": []string{"$"},
 		},
+		false, false, false, false, false, false,
 	},
 	{
 		tgCycle3, true, 2, 4, 6,
@@ -238,6 +255,7 @@ var grammarTestCases = []grammarTestCase{
 			"S": []string{"$"},
 			"A": []string{"$"},
 		},
+		false, false, false, false, false, false,
 	},
 	{
 		tgCycle4, true, 3, 6, 9,
@@ -257,6 +275,7 @@ var grammarTestCases = []grammarTestCase{
 			"A": []string{"$"},
 			"B": []string{"$"},
 		},
+		false, false, false, false, false, false,
 	},
 	{
 		tgNullable1, false, 7, 2, 10,
@@ -284,6 +303,7 @@ var grammarTestCases = []grammarTestCase{
 			"E": []string{"b", "$"},
 			"F": []string{"$"},
 		},
+		false, false, false, false, false, false,
 	},
 	{
 		tgNullable2, false, 7, 2, 12,
@@ -311,6 +331,7 @@ var grammarTestCases = []grammarTestCase{
 			"E": []string{"b", "$"},
 			"F": []string{"a", "b", "$"},
 		},
+		false, false, false, false, false, false,
 	},
 	{
 		tgNullable3, true, 8, 2, 16,
@@ -341,6 +362,7 @@ var grammarTestCases = []grammarTestCase{
 			"F": []string{"a", "b", "$"},
 			"G": []string{"$"},
 		},
+		false, false, false, false, false, false,
 	},
 	{
 		tgUnreachable1, true, 5, 5, 8,
@@ -364,6 +386,7 @@ var grammarTestCases = []grammarTestCase{
 			"Digits": []string{"\\*", "\\+", "\\)", "$"},
 			"U":      []string{},
 		},
+		false, false, false, true, true, true,
 	},
 	{
 		tgUnreachable2, true, 7, 8, 14,
@@ -391,6 +414,7 @@ var grammarTestCases = []grammarTestCase{
 			"V":      []string{},
 			"W":      []string{},
 		},
+		false, false, false, true, true, true,
 	},
 	{
 		tgUnproductive1, true, 5, 6, 8,
@@ -414,6 +438,7 @@ var grammarTestCases = []grammarTestCase{
 			"Digits": []string{"\\*", "\\+", "\\)", "$"},
 			"U":      []string{"u"},
 		},
+		false, false, false, true, true, true,
 	},
 	{
 		tgUnproductive2, true, 7, 7, 11,
@@ -442,6 +467,7 @@ var grammarTestCases = []grammarTestCase{
 			"V":      []string{},
 			"W":      []string{"\\*", "\\+", "\\)", "w", "$"},
 		},
+		false, false, false, true, true, true,
 	},
 	{
 		tgAdventure, false, 9, 23, 29,
@@ -481,6 +507,7 @@ var grammarTestCases = []grammarTestCase{
 			"Weapon":         []string{"$"},
 			"Opener":         []string{"$"},
 		},
+		true, true, false, true, true, true,
 	},
 	{
 		tgSlrE, false, 2, 2, 2,
@@ -499,5 +526,6 @@ var grammarTestCases = []grammarTestCase{
 			"S": []string{"$"},
 			"A": []string{"$"},
 		},
+		false, false, false, false, false, false,
 	},
 }
