@@ -35,7 +35,6 @@ func FromFile(filename string) (*Slrp, error) {
 	if gerr != nil {
 		return nil, gerr
 	}
-
 	return New(g)
 }
 
@@ -57,11 +56,10 @@ func (p Slrp) Parse(input string) *tree.Node {
 		return nil
 	}
 
-	n := 0
-
+	tstack := NewStackNode()
 	stack := stacks.NewStackInt()
 	stack.Push(0)
-	tstack := NewStackNode()
+	n := 0
 
 	for {
 		var actionList []Action
@@ -85,8 +83,8 @@ func (p Slrp) Parse(input string) *tree.Node {
 		// Perform the action.
 
 		if action := actionList[0]; action.IsShift() {
-			stack.Push(action.S)
 			tstack.Push(tree.New(sym, tokens[n].Value, nil))
+			stack.Push(action.S)
 			n++
 		} else if action.IsReduce() {
 			nt, n := p.t.M.ProductionFromNumber(action.S)
@@ -96,9 +94,9 @@ func (p Slrp) Parse(input string) *tree.Node {
 				stack.Pop()
 				children = append([]*tree.Node{tstack.Pop()}, children...)
 			}
-			stack.Push(p.t.G[stack.Peek()][nt])
 			tstack.Push(tree.New(symbols.NewNonTerminal(nt-1),
 				p.t.M.NonTerminals[nt], children))
+			stack.Push(p.t.G[stack.Peek()][nt])
 		} else if action.IsAccept() {
 			return tstack.Pop()
 		}
