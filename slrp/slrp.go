@@ -82,9 +82,9 @@ func (p Slrp) Parse(input string) *tree.Node {
 			return nil
 		}
 
-		action := actionList[0]
+		// Perform the action.
 
-		if action.IsShift() {
+		if action := actionList[0]; action.IsShift() {
 			stack.Push(action.S)
 			tstack.Push(tree.New(sym, tokens[n].Value, nil))
 			n++
@@ -103,5 +103,4 @@ func (p Slrp) Parse(input string) *tree.Node {
 			return tstack.Pop()
 		}
 	}
-	panic("unexpected action")
 }
