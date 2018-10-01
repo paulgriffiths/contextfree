@@ -10,7 +10,7 @@ func goTo(i SetItem, sym symbols.Symbol, g *grammar.Grammar) SetItem {
 
 	for _, item := range i.Elements() {
 		itemProd := g.Prods[item.Nt][item.Prod]
-		if itemProd.Within(item.Dot) {
+		if itemProd.AfterLast(item.Dot) {
 			continue
 		}
 

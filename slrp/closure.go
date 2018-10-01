@@ -14,7 +14,7 @@ func closure(s SetItem, g *grammar.Grammar) SetItem {
 
 		for _, item := range c.Elements() {
 			itemProd := g.Prods[item.Nt][item.Prod]
-			if itemProd.Within(item.Dot) {
+			if itemProd.AfterLast(item.Dot) {
 				continue
 			}
 
